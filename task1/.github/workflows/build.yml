@@ -1,0 +1,128 @@
+name: Build all platforms
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+jobs:
+  android:
+    name: Android (APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run common tests
+        run: ./gradlew :composeApp:testDebugUnitTest -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - name: Assemble debug APK
+        run: ./gradlew :composeApp:assembleDebug -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weather-android-debug-apk
+          path: composeApp/build/outputs/apk/debug/*.apk
+
+  desktop:
+    name: Desktop (Linux JVM)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run desktop tests (unit + UI + integration)
+        run: ./gradlew :composeApp:desktopTest -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - name: Package distribution
+        run: ./gradlew :composeApp:packageDistributionForCurrentOS -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weather-desktop-linux
+          path: |
+            composeApp/build/compose/binaries/main/deb/*.deb
+            composeApp/build/compose/jars/*.jar
+
+  web:
+    name: Web (Wasm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build Wasm distribution
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weather-web
+          path: composeApp/build/dist/wasmJs/productionExecutable/
+
+  ios:
+    name: iOS Framework
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Link iOS Simulator (arm64) framework
+        run: ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - name: Link iOS Device (arm64) framework
+        run: ./gradlew :composeApp:linkDebugFrameworkIosArm64 -POPENWEATHER_API_KEY=$OPENWEATHER_API_KEY --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weather-ios-frameworks
+          path: |
+            composeApp/build/bin/iosSimulatorArm64/debugFramework/
+            composeApp/build/bin/iosArm64/debugFramework/

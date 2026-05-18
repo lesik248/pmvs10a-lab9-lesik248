@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+
+# Local config
+local.properties
+secrets.properties
+
+# IDEA / Android Studio
+.idea/
+*.iml
+.kotlin/
+
+# macOS / Xcode (если будете добавлять iOS proj)
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# Node / Wasm dev cache
+node_modules/
+kotlin-js-store/
+
+# OS
+*.log
+
+README.md
