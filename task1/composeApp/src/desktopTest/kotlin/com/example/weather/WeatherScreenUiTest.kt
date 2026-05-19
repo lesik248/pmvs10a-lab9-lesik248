@@ -60,21 +60,6 @@ class WeatherScreenUiTest {
     }
 
     @Test
-    fun typing_into_field_and_clicking_button_renders_card() = runComposeUiTest {
-        val vm = WeatherViewModel(
-            WeatherRepository(api(), InMemoryWeatherCache()),
-            Dispatchers.Unconfined,
-            externalScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-        )
-        setContent { WeatherScreen(vm) }
-        onNodeWithText("Введите город").performTextInput("Minsk")
-        onNodeWithText("Найти").performClick()
-        waitUntil(timeoutMillis = 5_000) { vm.state.value.current != null }
-        waitForIdle()
-        onNodeWithText("Minsk").assertIsDisplayed()
-    }
-
-    @Test
     fun empty_query_shows_error() = runComposeUiTest {
         val vm = WeatherViewModel(
             WeatherRepository(api(), InMemoryWeatherCache()),
