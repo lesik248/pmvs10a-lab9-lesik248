@@ -13,6 +13,9 @@ jobs:
   android:
     name: Android (APK)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: task1
     steps:
       - uses: actions/checkout@v4
 
@@ -24,6 +27,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: task1
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -37,11 +42,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: weather-android-debug-apk
-          path: composeApp/build/outputs/apk/debug/*.apk
+          path: task1/composeApp/build/outputs/apk/debug/*.apk
 
   desktop:
     name: Desktop (Linux JVM)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: task1
     steps:
       - uses: actions/checkout@v4
 
@@ -53,6 +61,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: task1
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -67,12 +77,15 @@ jobs:
         with:
           name: weather-desktop-linux
           path: |
-            composeApp/build/compose/binaries/main/deb/*.deb
-            composeApp/build/compose/jars/*.jar
+            task1/composeApp/build/compose/binaries/main/deb/*.deb
+            task1/composeApp/build/compose/jars/*.jar
 
   web:
     name: Web (Wasm)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: task1
     steps:
       - uses: actions/checkout@v4
 
@@ -84,6 +97,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: task1
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -94,11 +109,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: weather-web
-          path: composeApp/build/dist/wasmJs/productionExecutable/
+          path: task1/composeApp/build/dist/wasmJs/productionExecutable/
 
   ios:
     name: iOS Framework
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: task1
     steps:
       - uses: actions/checkout@v4
 
@@ -110,6 +128,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: task1
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -124,5 +144,5 @@ jobs:
         with:
           name: weather-ios-frameworks
           path: |
-            composeApp/build/bin/iosSimulatorArm64/debugFramework/
-            composeApp/build/bin/iosArm64/debugFramework/
+            task1/composeApp/build/bin/iosSimulatorArm64/debugFramework/
+            task1/composeApp/build/bin/iosArm64/debugFramework/
