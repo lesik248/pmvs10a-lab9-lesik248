@@ -13,7 +13,6 @@ import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -60,8 +59,7 @@ class WeatherIntegrationTest {
         )
 
         vm.updateQuery("Minsk")
-        vm.search()
-        advanceUntilIdle()
+        vm.search()?.join()
 
         val state = vm.state.value
         assertNotNull(state.current)
@@ -88,8 +86,8 @@ class WeatherIntegrationTest {
             externalScope = this
         )
 
-        vm.updateQuery("Minsk"); vm.search(); advanceUntilIdle()
-        vm.updateQuery("Brest"); vm.search(); advanceUntilIdle()
+        vm.updateQuery("Minsk"); vm.search()?.join()
+        vm.updateQuery("Brest"); vm.search()?.join()
 
         val cities = vm.state.value.savedCities.map { it.city }.toSet()
         assertEquals(setOf("Minsk", "Brest"), cities)
@@ -118,8 +116,8 @@ class WeatherIntegrationTest {
             externalScope = this
         )
 
-        vm.updateQuery("Minsk"); vm.search(); advanceUntilIdle()
-        vm.updateQuery("Minsk"); vm.search(); advanceUntilIdle()
+        vm.updateQuery("Minsk"); vm.search()?.join()
+        vm.updateQuery("Minsk"); vm.search()?.join()
 
         val state = vm.state.value
         assertNotNull(state.current)

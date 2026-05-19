@@ -8,6 +8,7 @@ import com.example.weather.data.model.Weather
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,14 +61,14 @@ class WeatherViewModel(
         }
     }
 
-    fun search(city: String? = null) {
+    fun search(city: String? = null): Job? {
         val target = (city ?: _state.value.query).trim()
         if (target.isEmpty()) {
             _state.update { it.copy(error = "Введите название города") }
-            return
+            return null
         }
         _state.update { it.copy(isLoading = true, error = null, offlineNotice = false) }
-        scope.launch {
+        return scope.launch {
             val result = withContext(ioDispatcher) { repo.getWeather(target) }
             when (result) {
                 is WeatherResult.Success -> {

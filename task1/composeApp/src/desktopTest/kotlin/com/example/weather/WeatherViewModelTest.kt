@@ -12,7 +12,6 @@ import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -58,8 +57,7 @@ class WeatherViewModelTest {
             externalScope = this
         )
         vm.updateQuery("Minsk")
-        vm.search()
-        advanceUntilIdle()
+        vm.search()?.join()
         val state = vm.state.value
         assertNotNull(state.current)
         assertEquals("Minsk", state.current?.city)
@@ -88,13 +86,11 @@ class WeatherViewModelTest {
             externalScope = this
         )
         vm.updateQuery("Minsk")
-        vm.search()
-        advanceUntilIdle()
+        vm.search()?.join()
         vm.updateQuery("Brest")
         // Second call updates the engine result name, but model uses 'Minsk' anyway —
         // we just need it to add a second city to savedCities.
-        vm.search()
-        advanceUntilIdle()
+        vm.search()?.join()
         assertTrue(vm.state.value.savedCities.isNotEmpty())
     }
 

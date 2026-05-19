@@ -69,6 +69,7 @@ class WeatherScreenUiTest {
         setContent { WeatherScreen(vm) }
         onNodeWithText("Введите город").performTextInput("Minsk")
         onNodeWithText("Найти").performClick()
+        waitUntil(timeoutMillis = 5_000) { vm.state.value.current != null }
         waitForIdle()
         onNodeWithText("Minsk").assertIsDisplayed()
     }
@@ -96,6 +97,7 @@ class WeatherScreenUiTest {
         setContent { WeatherScreen(vm) }
         onNodeWithText("Введите город").performTextInput("Minsk")
         onNodeWithText("Найти").performClick()
+        waitUntil(timeoutMillis = 5_000) { vm.state.value.current != null }
         waitForIdle()
         onNodeWithText("12°C").assertIsDisplayed()
     }
